@@ -9,17 +9,23 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/smartcow99/EIEIE.git"
+    "url": "git+https://github.com/SSU-EIEIE/backend.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/smartcow99/EIEIE/issues"
+    "url": "https://github.com/SSU-EIEIE/backend/issues"
   },
-  "homepage": "https://github.com/smartcow99/EIEIE#readme",
+  "homepage": "https://github.com/SSU-EIEIE/backend#readme",
   "dependencies": {
-    "express": "^4.18.1"
+    "cookie-parser": "^1.4.6",
+    "dotenv": "^16.0.1",
+    "express": "^4.18.1",
+    "express-session": "^1.17.3",
+    "morgan": "^1.10.0",
+    "mysql2": "^2.3.3",
+    "pug": "^3.0.2"
   },
   "devDependencies": {
     "nodemon": "^2.0.19"
