@@ -11,6 +11,7 @@ router.post('/login', async (req, res) =>{
     if(result && result.email){
         req.session.islogined = true;
         req.session.email = result.email;
+        res.cookie('email', result.email);
         console.log(`islogined session : ${req.session.islogined} \nemail session: ${req.session.email}`);
         res.status(200).send('login success');
     }
@@ -37,6 +38,7 @@ router.get('/logout', islogined, (req,res)=>{
     req.session.destroy(function(){
         req.session;
     });
+    res.clearCookie('email');
     res.status(200).send('logout success');
     
 })
