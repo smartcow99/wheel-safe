@@ -2,6 +2,7 @@ var express = require('express');
 var router = express.Router();
 const db = require('../models/db');
 const islogined = require('../models/logincheck');
+const request = require('request');
 
 
 router.post('/login', async (req, res) =>{
@@ -42,5 +43,43 @@ router.get('/logout', islogined, (req,res)=>{
     res.status(200).send('logout success');
     
 })
+
+router.get('/poi', (req,res)=>{
+    var url = 'https://apis.openapi.sk.com/tmap/pois?version=1&format=json&callback=result';
+    var queryParams =
+    '&' +
+    encodeURIComponent('page') +
+    '=' +
+    encodeURIComponent(parseInt("1"));
+
+    queryParams += 
+    '&' +
+    encodeURIComponent('searchKeyword') +
+    '=' +
+    encodeURIComponent(req.body.searchKeyword);
+
+    queryParams +=
+    '&' +
+    encodeURIComponent('areaLLCode') +
+    '=' +
+    encodeURIComponent('서울');
+
+    queryParams +=
+    '&' +
+    encodeURIComponent('appKey') +
+    '=' +
+    encodeURIComponent(`${process.env.TMAP_KEY}`);
+    console.log(url + queryParams);
+    request(
+        {
+            url: url + queryParams,
+            method: 'GET'
+        },
+        function(error, res, body){
+            console.log(res.searchPoiInfo);
+        }
+    );
+    res.status(200).send('Poi success');
+});
 
 module.exports = router;
