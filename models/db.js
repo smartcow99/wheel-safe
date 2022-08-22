@@ -24,6 +24,11 @@ const api = {
         const [res] = await pool.query(`select email from ${process.env.LOGIN_TABLE} where email = '${email}'`);
         return res;
     },
+
+    report: async(email, title, content, img)=>{
+        const [res] = await pool.query(`insert into report(email, title, content, image, date) values('${email}','${title}', '${content}', '${img}', now())`);
+        return res;
+    }
 }
 
 module.exports = new Proxy(api,{
@@ -53,6 +58,15 @@ module.exports = new Proxy(api,{
             return async function(email, pw){
                 if(email && pw)
                     return await target.register(email, pw);
+                else
+                    return null;
+            }
+        }
+
+        else if(apiName =='report'){
+            return async function(email, title, content, img){
+                if(email && title && content && img)
+                    return await target.report(email, title, content, img);
                 else
                     return null;
             }

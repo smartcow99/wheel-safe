@@ -3,6 +3,21 @@ var router = express.Router();
 const db = require('../models/db');
 const islogined = require('../models/logincheck');
 const request = require('request');
+const multer = require('multer');
+const path = require('path');
+
+const upload = multer({
+    storage: multer.diskStorage({
+        destination(req, file, done){
+            done(null, 'uploads/');
+        },
+        filename(req, file, done){
+            const ext = path.extname(file.originalname);
+            done(null, path.basename(file.originalname, ext) + Date.now() + ext);
+        },
+    }),
+    limits : { fileSize: 10 * 1024 * 1024},
+})
 
 
 router.post('/login', async (req, res) =>{
@@ -42,6 +57,23 @@ router.get('/logout', islogined, (req,res)=>{
     res.clearCookie('email');
     res.status(200).send('logout success');
     
+})
+
+router.post('/report', upload.single('image'),async (req, res)=>{
+    const user = req.cookies.email;
+    const title = req.body.title;
+    const content = req.body.content;
+    const image = `/uploads/${req.file.filename}`;
+
+    console.log(user, title, content, req.file.filename);
+    
+    if(user && title && content){
+        db.report(user,title, content, image);
+        res.status(200).send('report success');
+    }
+    else{
+        res.status(401).send('report fail');
+    }
 })
 
 router.get('/poi', (req,res)=>{
