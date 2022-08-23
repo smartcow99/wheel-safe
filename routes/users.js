@@ -82,9 +82,9 @@ router.get('/reports', async(req,res)=>{
     const [...result] = await db.reports(user);
     console.log(user);
     if(result){
-        res.status(200).send('reports success');
+        res.status(200).send(result);
         console.log(result);
-        res.send(res);
+        //res.send(result);
     }
     else{
         res.status(401).send('reports fail or nothing');
