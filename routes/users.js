@@ -72,7 +72,6 @@ router.post('/report', upload.single('image'), async (req, res) => {
   } else {
     res.status(401).send('report fail');
   }
->>>>>>> 954051542e6cb07cc7c92ecf0cbdf0431a4db65e
 });
 
 router.get('/reports', async (req, res) => {
