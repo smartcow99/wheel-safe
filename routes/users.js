@@ -211,7 +211,7 @@ router.get('/poisearch', async (req, res) => {
   });
 });
 
-router.get('/electirc', async (req, res) => {
+router.get('/electric', async (req, res) => {
   const url =
     'http://api.data.go.kr/openapi/tn_pubr_public_electr_whlchairhgh_spdchrgr_api';
   let queryParams =
