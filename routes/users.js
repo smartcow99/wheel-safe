@@ -72,39 +72,42 @@ router.post('/report', upload.single('image'), async (req, res) => {
     res.status(401).send('report fail');
   }
 });
-
+/*
 router.get('/poi', (req, res) => {
-  var url =
-    'https://apis.openapi.sk.com/tmap/pois?version=1&format=json&callback=result';
-  var queryParams =
-    '&' + encodeURIComponent('page') + '=' + encodeURIComponent(parseInt('1'));
-
-  queryParams +=
+  console.log(req.body.searchKeyword);
+  const url = 'https://apis.openapi.sk.com/tmap/pois?version=1';
+  let queryParams =
     '&' +
     encodeURIComponent('searchKeyword') +
     '=' +
-    encodeURIComponent(req.body.searchKeyword);
+    encodeURIComponent(`${req.body.searchKeyword}`);
+  queryParams +=
+    '&' + encodeURIComponent('searchType') + '=' + encodeURIComponent('name');
 
   queryParams +=
     '&' + encodeURIComponent('areaLLCode') + '=' + encodeURIComponent('서울');
+
+  queryParams +=
+    '&' + encodeURIComponent('areaLMCode') + '=' + encodeURIComponent('동작구');
 
   queryParams +=
     '&' +
     encodeURIComponent('appKey') +
     '=' +
     encodeURIComponent(`${process.env.TMAP_KEY}`);
-  console.log(url + queryParams);
   request(
     {
       url: url + queryParams,
       method: 'GET',
     },
     function (error, res, body) {
-      console.log(res.searchPoiInfo);
+      let rs = JSON.parse(body);
+      console.log(rs);
     }
   );
   res.status(200).send('Poi success');
 });
+*/
 
 /**
  *
