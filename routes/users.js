@@ -36,7 +36,6 @@ router.post('/login', async (req, res) => {
   }
 });
 
-
 router.post('/register', async (req, res) => {
   const [isMember] = await db.isMember(req.body.email);
   console.log(isMember);
@@ -50,45 +49,42 @@ router.post('/register', async (req, res) => {
   }
 });
 
-router.get('/logout', islogined, (req,res)=>{
-    req.session.destroy(function(){
-        req.session;
-    });
-    res.clearCookie('email');
-    res.status(200).send('logout success');
-    
-})
-
-router.post('/report', upload.single('image'),async (req, res)=>{
-    const user = req.cookies.email;
-    const title = req.body.title;
-    const content = req.body.content;
-    const addr = req.body.address;
-    const image = `/uploads/${req.file.filename}`;
-
-    console.log(user, title, content, req.file.filename);
-
-    if(user && title && content && addr){
-        db.report(user,title,addr, content, image);
-        res.status(200).send('report success');
-    }
-    else{
-        res.status(401).send('report fail');
-    }
+router.get('/logout', islogined, (req, res) => {
+  req.session.destroy(function () {
+    req.session;
+  });
+  res.clearCookie('email');
+  res.status(200).send('logout success');
 });
 
-router.get('/reports', async(req,res)=>{
-    const user = req.cookies.email;
-    const [...result] = await db.reports(user);
-    console.log(user);
-    if(result){
-        res.status(200).send('reports success');
-        console.log(result);
-        res.send(res);
-    }
-    else{
-        res.status(401).send('reports fail or nothing');
-    }
+router.post('/report', upload.single('image'), async (req, res) => {
+  const user = req.cookies.email;
+  const title = req.body.title;
+  const content = req.body.content;
+  const addr = req.body.address;
+  const image = `/uploads/${req.file.filename}`;
+
+  console.log(user, title, content, req.file.filename);
+
+  if (user && title && content && addr) {
+    db.report(user, title, addr, content, image);
+    res.status(200).send('report success');
+  } else {
+    res.status(401).send('report fail');
+  }
+});
+
+router.get('/reports', async (req, res) => {
+  const user = req.cookies.email;
+  const [...result] = await db.reports(user);
+  console.log(user);
+  if (result) {
+    res.status(200).send('reports success');
+    console.log(result);
+    res.send(res);
+  } else {
+    res.status(401).send('reports fail or nothing');
+  }
 });
 /*
 router.get('/poi', (req, res) => {
@@ -197,7 +193,6 @@ async function callbackLatLon(fromLat, fromLon, toLat, toLon, num) {
       {
         url: url + qp,
         method: 'GET',
-        timeout: 5000,
       },
 
       function (err, res, body) {
@@ -212,6 +207,7 @@ async function callbackLatLon(fromLat, fromLon, toLat, toLon, num) {
     );
   });
 }
+
 router.get('/poisearch', async (req, res) => {
   let coordinates = [{}];
   let passLists;
@@ -255,9 +251,51 @@ router.get('/poisearch', async (req, res) => {
       passList: passLists,
     },
   };
-  request.post(options, function (err, result, body) {
+  request.post(options, function (err, response, body) {
+    let result = JSON.parse(body);
     res.status(200).send(result);
   });
+});
+
+router.get('/electirc', async (req, res) => {
+  const url =
+    'http://api.data.go.kr/openapi/tn_pubr_public_electr_whlchairhgh_spdchrgr_api';
+  let queryParams =
+    '?' +
+    encodeURIComponent('serviceKey') +
+    '=' +
+    `${process.env.OPEN_KEY}`; /* Service Key*/
+  queryParams +=
+    '&' + encodeURIComponent('pageNo') + '=' + encodeURIComponent('0'); /* */
+  queryParams +=
+    '&' + encodeURIComponent('numOfRows') + '=' + encodeURIComponent('5'); /* */
+  queryParams +=
+    '&' + encodeURIComponent('type') + '=' + encodeURIComponent('json'); /* */
+  queryParams +=
+    '&' +
+    encodeURIComponent('ctprvnNm') +
+    '=' +
+    encodeURIComponent('서울특별시'); /* */
+  queryParams +=
+    '&' +
+    encodeURIComponent('signguNm') +
+    '=' +
+    encodeURIComponent(`${req.body.signguNm}`); /* */
+
+  request(
+    {
+      url: url + queryParams,
+      method: 'GET',
+    },
+    function (err, response, body) {
+      if (!err && res.statusCode === 200) {
+        resultJson = JSON.parse(body);
+        res.status(200).send(resultJson);
+      } else {
+        console.log(err);
+      }
+    }
+  );
 });
 
 module.exports = router;
