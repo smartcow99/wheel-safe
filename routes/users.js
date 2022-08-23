@@ -225,11 +225,9 @@ router.get('/poisearch', async (req, res) => {
       passList: passLists,
     },
   };
-  request.post(options, function (err, res, body) {
-    console.log(body);
-    console.log(res.statusCode);
+  request.post(options, function (err, result, body) {
+    res.status(200).send(result);
   });
-  res.status(200).send('response sucess');
 });
 
 module.exports = router;
