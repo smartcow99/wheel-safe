@@ -36,10 +36,38 @@ router.post('/login', async (req, res) => {
   }
 });
 
+
 router.post('/register', async (req, res) => {
   const [isMember] = await db.isMember(req.body.email);
   console.log(isMember);
   console.log(req.body.email, req.body.password);
+
+router.get('/logout', islogined, (req,res)=>{
+    req.session.destroy(function(){
+        req.session;
+    });
+    res.clearCookie('email');
+    res.status(200).send('logout success');
+    
+})
+
+router.post('/report', upload.single('image'),async (req, res)=>{
+    const user = req.cookies.email;
+    const title = req.body.title;
+    const content = req.body.content;
+    const image = `/uploads/${req.file.filename}`;
+
+    console.log(user, title, content, req.file.filename);
+
+    if(user && title && content){
+        db.report(user,title, content, image);
+        res.status(200).send('report success');
+    }
+    else{
+        res.status(401).send('report fail');
+    }
+})
+
 
   if (isMember) {
     res.status(401).send('register fail');
