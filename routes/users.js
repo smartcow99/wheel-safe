@@ -79,58 +79,12 @@ router.get('/reports', async (req, res) => {
   const [...result] = await db.reports(user);
   console.log(user);
   if (result) {
-    res.status(200).send('reports success');
     console.log(result);
-    res.send(res);
+    res.status(200).send(result);
   } else {
     res.status(401).send('reports fail or nothing');
   }
 });
-/*
-router.get('/poi', (req, res) => {
-
-  console.log(req.body.searchKeyword);
-  const url = 'https://apis.openapi.sk.com/tmap/pois?version=1';
-  let queryParams =
-
-  var url =
-    'https://apis.openapi.sk.com/tmap/pois?version=1&format=json&callback=result';
-  var queryParams =
-    '&' + encodeURIComponent('page') + '=' + encodeURIComponent(parseInt('0'));
-
-  queryParams +=
-    '&' +
-    encodeURIComponent('searchKeyword') +
-    '=' +
-    encodeURIComponent(`${req.body.searchKeyword}`);
-
-  queryParams +=
-    '&' + encodeURIComponent('searchType') + '=' + encodeURIComponent('name');
-
-  queryParams +=
-    '&' + encodeURIComponent('areaLLCode') + '=' + encodeURIComponent('서울');
-
-  queryParams +=
-    '&' + encodeURIComponent('areaLMCode') + '=' + encodeURIComponent('동작구');
-
-  queryParams +=
-    '&' +
-    encodeURIComponent('appKey') +
-    '=' +
-    encodeURIComponent(`${process.env.TMAP_KEY}`);
-  request(
-    {
-      url: url + queryParams,
-      method: 'GET',
-    },
-    function (error, res, body) {
-      let rs = JSON.parse(body);
-      console.log(rs);
-    }
-  );
-  res.status(200).send('Poi success');
-});
-*/
 
 /**
  *
@@ -292,7 +246,7 @@ router.get('/electirc', async (req, res) => {
         resultJson = JSON.parse(body);
         res.status(200).send(resultJson);
       } else {
-        console.log(err);
+        res.status(401).send('error');
       }
     }
   );
