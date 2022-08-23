@@ -42,6 +42,14 @@ router.post('/register', async (req, res) => {
   console.log(isMember);
   console.log(req.body.email, req.body.password);
 
+  if (isMember) {
+    res.status(401).send('register fail');
+  } else {
+    db.register(req.body.email, req.body.password);
+    res.status(200).send('register success');
+  }
+});
+
 router.get('/logout', islogined, (req,res)=>{
     req.session.destroy(function(){
         req.session;
@@ -55,60 +63,51 @@ router.post('/report', upload.single('image'),async (req, res)=>{
     const user = req.cookies.email;
     const title = req.body.title;
     const content = req.body.content;
+    const addr = req.body.address;
     const image = `/uploads/${req.file.filename}`;
 
     console.log(user, title, content, req.file.filename);
 
-    if(user && title && content){
-        db.report(user,title, content, image);
+    if(user && title && content && addr){
+        db.report(user,title,addr, content, image);
         res.status(200).send('report success');
     }
     else{
         res.status(401).send('report fail');
     }
-})
-
-
-  if (isMember) {
-    res.status(401).send('register fail');
-  } else {
-    db.register(req.body.email, req.body.password);
-    res.status(200).send('register success');
-  }
 });
 
-router.get('/logout', islogined, (req, res) => {
-  req.session.destroy(function () {
-    req.session;
-  });
-  res.clearCookie('email');
-  res.status(200).send('logout success');
-});
-
-router.post('/report', upload.single('image'), async (req, res) => {
-  const user = req.cookies.email;
-  const title = req.body.title;
-  const content = req.body.content;
-  const image = `/uploads/${req.file.filename}`;
-
-  console.log(user, title, content, req.file.filename);
-
-  if (user && title && content) {
-    db.report(user, title, content, image);
-    res.status(200).send('report success');
-  } else {
-    res.status(401).send('report fail');
-  }
+router.get('/reports', async(req,res)=>{
+    const user = req.cookies.email;
+    const [...result] = await db.reports(user);
+    console.log(user);
+    if(result){
+        res.status(200).send('reports success');
+        console.log(result);
+        res.send(res);
+    }
+    else{
+        res.status(401).send('reports fail or nothing');
+    }
 });
 /*
 router.get('/poi', (req, res) => {
+
   console.log(req.body.searchKeyword);
   const url = 'https://apis.openapi.sk.com/tmap/pois?version=1';
   let queryParams =
+
+  var url =
+    'https://apis.openapi.sk.com/tmap/pois?version=1&format=json&callback=result';
+  var queryParams =
+    '&' + encodeURIComponent('page') + '=' + encodeURIComponent(parseInt('0'));
+
+  queryParams +=
     '&' +
     encodeURIComponent('searchKeyword') +
     '=' +
     encodeURIComponent(`${req.body.searchKeyword}`);
+
   queryParams +=
     '&' + encodeURIComponent('searchType') + '=' + encodeURIComponent('name');
 

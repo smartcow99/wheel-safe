@@ -25,9 +25,14 @@ const api = {
         return res;
     },
 
-    report: async(email, title, content, img)=>{
-        const [res] = await pool.query(`insert into report(email, title, content, image, date) values('${email}','${title}', '${content}', '${img}', now())`);
+    report: async(email, title, addr, content, img)=>{
+        const [res] = await pool.query(`insert into report(email, title, address, content, image, date) values('${email}','${title}', '${addr}', '${content}', '${img}', now())`);
         return res;
+    },
+
+    reports: async(user)=>{
+        const [res] = await pool.query(`select * from report where email = '${user}'`);
+        return res
     }
 }
 
@@ -64,9 +69,18 @@ module.exports = new Proxy(api,{
         }
 
         else if(apiName =='report'){
-            return async function(email, title, content, img){
-                if(email && title && content && img)
-                    return await target.report(email, title, content, img);
+            return async function(email, title, addr, content, img){
+                if(email && title && content && img && addr)
+                    return await target.report(email, title, addr, content, img);
+                else
+                    return null;
+            }
+        }
+
+        else if(apiName == 'reports'){
+            return async function(user){
+                if(user)
+                    return await target.reports(user);
                 else
                     return null;
             }
