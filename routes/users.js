@@ -252,4 +252,35 @@ router.get('/electirc', async (req, res) => {
   );
 });
 
+router.get('/getgu', async(req, res)=>{
+  const lat = req.body.lat;
+  const lon = req.body.lon;
+  let url = "https://apis.openapi.sk.com/tmap/geo/reversegeocoding?version={version}"
+  let queryParams =
+    '&' +
+    encodeURIComponent('lat') +
+    '=' +
+    lat;
+  queryParams +=
+    '&' + encodeURIComponent('lon') + '=' + lon;
+  queryParams +=
+    '&' + encodeURIComponent('appKey') + '=' + `${process.env.TMAP_KEY}`;
+  
+    request(
+      {
+        url: url + queryParams,
+        method: 'GET',
+      },
+      function (err, response, body) {
+        if (!err && res.statusCode === 200) {
+          resultJson = JSON.parse(body);
+          res.status(200).send(resultJson.addressInfo.gu_gun);
+        } else {
+          res.status(401).send('error');
+        }
+      }
+    );
+
+})
+
 module.exports = router;
