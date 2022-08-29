@@ -212,29 +212,30 @@ router.get('/poisearch', async (req, res) => {
 });
 
 router.get('/electric', async (req, res) => {
+  let fg = await findgu(req.body.lat, req.body.lon);
+  // console.log(fg);
+  let signgu = fg.addressInfo.gu_gun;
+
   const url =
     'http://api.data.go.kr/openapi/tn_pubr_public_electr_whlchairhgh_spdchrgr_api';
   let queryParams =
-    '?' +
-    encodeURIComponent('serviceKey') +
-    '=' +
-    `${process.env.OPEN_KEY}`; /* Service Key*/
+    '?' + encodeURIComponent('serviceKey') + '=' + `${process.env.OPEN_KEY}`;
   queryParams +=
-    '&' + encodeURIComponent('pageNo') + '=' + encodeURIComponent('0'); /* */
+    '&' + encodeURIComponent('pageNo') + '=' + encodeURIComponent('0');
   queryParams +=
-    '&' + encodeURIComponent('numOfRows') + '=' + encodeURIComponent('5'); /* */
+    '&' + encodeURIComponent('numOfRows') + '=' + encodeURIComponent('5');
   queryParams +=
-    '&' + encodeURIComponent('type') + '=' + encodeURIComponent('json'); /* */
+    '&' + encodeURIComponent('type') + '=' + encodeURIComponent('json');
   queryParams +=
     '&' +
     encodeURIComponent('ctprvnNm') +
     '=' +
-    encodeURIComponent('서울특별시'); /* */
+    encodeURIComponent('서울특별시');
   queryParams +=
     '&' +
     encodeURIComponent('signguNm') +
     '=' +
-    encodeURIComponent(`${req.body.signguNm}`); /* */
+    encodeURIComponent(`${signgu}`);
 
   request(
     {
@@ -252,35 +253,38 @@ router.get('/electric', async (req, res) => {
   );
 });
 
-router.get('/getgu', async(req, res)=>{
-  const lat = req.body.lat;
-  const lon = req.body.lon;
-  let url = "https://apis.openapi.sk.com/tmap/geo/reversegeocoding?version={version}"
-  let queryParams =
-    '&' +
-    encodeURIComponent('lat') +
-    '=' +
-    lat;
-  queryParams +=
-    '&' + encodeURIComponent('lon') + '=' + lon;
+/**
+ * @param {Float} lat 위도
+ * @param {Float} lon 경도
+ */
+async function findgu(lat, lon) {
+  const url =
+    'https://apis.openapi.sk.com/tmap/geo/reversegeocoding?version={version}';
+
+  let queryParams = '&' + encodeURIComponent('lat') + '=' + lat;
+  queryParams += '&' + encodeURIComponent('lon') + '=' + lon;
   queryParams +=
     '&' + encodeURIComponent('appKey') + '=' + `${process.env.TMAP_KEY}`;
-  
+
+  return new Promise((resolve, reject) => {
+    let resultJson = {};
     request(
       {
         url: url + queryParams,
         method: 'GET',
       },
-      function (err, response, body) {
+
+      function (err, res, body) {
         if (!err && res.statusCode === 200) {
           resultJson = JSON.parse(body);
-          res.status(200).send(resultJson.addressInfo.gu_gun);
+          resolve(resultJson);
         } else {
-          res.status(401).send('error');
+          resultJson['error'] = 'Some error';
+          reject(resultJson);
         }
       }
     );
-
-})
+  });
+}
 
 module.exports = router;
