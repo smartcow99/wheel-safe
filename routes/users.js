@@ -5,6 +5,7 @@ const islogined = require('../models/logincheck');
 const request = require('request');
 const multer = require('multer');
 const path = require('path');
+const cors = require('cors');
 
 const upload = multer({
   storage: multer.diskStorage({
