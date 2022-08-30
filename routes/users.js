@@ -200,8 +200,8 @@ router.get('/poisearch', async (req, res) => {
       searchOption: 4,
       appkey: process.env.TMAP_KEY,
       reqCoordType: 'WGS84GEO',
-      startName: encodeURIComponent(`${req.body.startName}`),
-      endName: encodeURIComponent(`${req.body.endName}`),
+      startName: encodeURIComponent(`${req.query.startName}`),
+      endName: encodeURIComponent(`${req.query.endName}`),
       passList: passLists,
     },
   };
