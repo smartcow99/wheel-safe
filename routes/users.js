@@ -191,12 +191,12 @@ router.get('/poisearch', async (req, res) => {
     uri: 'https://apis.openapi.sk.com/tmap/routes/pedestrian?version={version}&callback={callback}',
     method: 'POST',
     form: {
-      startX: req.body.fromLon,
-      startY: req.body.fromLat,
+      startX: req.query.fromLon,
+      startY: req.query.fromLat,
       angle: 20,
       speed: 30,
-      endX: req.body.toLon,
-      endY: req.body.toLat,
+      endX: req.query.toLon,
+      endY: req.query.toLat,
       searchOption: 4,
       appkey: process.env.TMAP_KEY,
       reqCoordType: 'WGS84GEO',
@@ -245,6 +245,7 @@ router.get('/electric', async (req, res) => {
     function (err, response, body) {
       if (!err && res.statusCode === 200) {
         resultJson = JSON.parse(body);
+        console.log(resultJson);
         res.status(200).send(resultJson);
       } else {
         res.status(401).send('error');
