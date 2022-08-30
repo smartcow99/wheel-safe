@@ -26,7 +26,7 @@ router.post('/login', async (req, res) => {
   if (result && result.email) {
     req.session.islogined = true;
     req.session.email = result.email;
-    res.cookie('email', result.email, {maxAge: 100000000});
+    res.cookie('email', result.email, { maxAge: 100000000 });
     console.log(
       `islogined session : ${req.session.islogined} \nemail session: ${req.session.email}`
     );
@@ -154,6 +154,8 @@ async function callbackLatLon(fromLat, fromLon, toLat, toLon, num) {
           resultJson = JSON.parse(body);
           resolve(resultJson);
         } else {
+          console.log(err);
+
           resultJson['error'] = 'Some error';
           reject(resultJson);
         }
