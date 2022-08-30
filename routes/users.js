@@ -167,10 +167,10 @@ router.get('/poisearch', async (req, res) => {
   let passLists;
   for (let i = 0; i < 5; i++) {
     let tmp = await callbackLatLon(
-      req.body.fromLat,
-      req.body.fromLon,
-      req.body.toLat,
-      req.body.toLon,
+      req.query.fromLat,
+      req.query.fromLon,
+      req.query.toLat,
+      req.query.toLon,
       i
     );
     coordinates.push({
@@ -212,7 +212,7 @@ router.get('/poisearch', async (req, res) => {
 });
 
 router.get('/electric', async (req, res) => {
-  let fg = await findgu(req.body.lat, req.body.lon);
+  let fg = await findgu(req.query.lat, req.query.lon);
   // console.log(fg);
   let signgu = fg.addressInfo.gu_gun;
 
