@@ -66,6 +66,7 @@ async function callbackLatLon(fromLat, fromLon, toLat, toLon, num) {
           resultJson = JSON.parse(body);
           resolve(resultJson);
         } else {
+          console.log(err);
           resultJson['error'] = 'Some error';
           reject(resultJson);
         }
