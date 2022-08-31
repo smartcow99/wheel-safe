@@ -182,9 +182,25 @@ router.get('/poisearch', async (req, res) => {
     });
   }
   console.log(coordinates);
+  let ori_x = (req.query.fromLon - req.query.toLon);
+  let ori_y = (req.query.fromLat - req.query.toLat);
+  let dis_u = Math.sqrt(ori_x * ori_x + ori_y * ori_y);
+  let norm_x = ori_x / dis_u;
+  let norm_y = ori_y / dis_u;
+  console.log(dis_u);
   for (let i = 1; i < 6; i++) {
     if (Object.keys(coordinates[i]).length != 0) {
-      passLists += coordinates[i].lon + ',' + coordinates[i].lat + '_';
+      let dif_x = (req.query.fromLon - coordinates[i].lon);
+      let dif_y = (req.query.fromLat - coordinates[i].lat);
+      let dis_v = Math.sqrt(dif_x*dif_x + dif_y*dif_y);
+      let norm_x2 = dif_x / dis_v;
+      let norm_y2 = dif_y / dis_v;
+      let theta = norm_x * norm_x2 + norm_y * norm_y2;
+      theta = Math.acos(theta);
+      let degree = theta * (180/3.141592);
+      console.log(theta, degree);
+      if(degeree<30)
+        passLists += coordinates[i].lon + ',' + coordinates[i].lat + '_';
     }
   }
 
