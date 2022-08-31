@@ -22,15 +22,10 @@ const upload = multer({
 
 router.post('/login', async (req, res) => {
   const [result] = await db.login(req.body.email, req.body.password);
-  console.log(result);
-  console.log(req.body.email, req.body.password);
   if (result && result.email) {
     req.session.islogined = true;
     req.session.email = result.email;
     res.cookie('email', result.email, { maxAge: 100000000 });
-    console.log(
-      `islogined session : ${req.session.islogined} \nemail session: ${req.session.email}`
-    );
     res.status(200).send('login success');
   } else {
     res.status(401).send('login fail');
@@ -39,9 +34,6 @@ router.post('/login', async (req, res) => {
 
 router.post('/register', async (req, res) => {
   const [isMember] = await db.isMember(req.body.email);
-  console.log(isMember);
-  console.log(req.body.email, req.body.password);
-
   if (isMember) {
     res.status(401).send('register fail');
   } else {
@@ -63,10 +55,7 @@ router.post('/report', upload.single('image'), async (req, res) => {
   const title = req.body.title;
   const content = req.body.content;
   const addr = req.body.address;
-  const image = `/uploads/${req.file.filename}`;
-
-  console.log(user, title, content, req.file.filename);
-
+  const image = `/uploads/${req.file.image}`;
   if (user && title && content && addr) {
     db.report(user, title, addr, content, image);
     res.status(200).send('report success');
@@ -80,7 +69,6 @@ router.get('/reports', async (req, res) => {
   const [...result] = await db.reports(user);
   console.log(user);
   if (result) {
-    console.log(result);
     res.status(200).send(result);
   } else {
     res.status(401).send('reports fail or nothing');
@@ -155,8 +143,6 @@ async function callbackLatLon(fromLat, fromLon, toLat, toLon, num) {
           resultJson = JSON.parse(body);
           resolve(resultJson);
         } else {
-          console.log(err);
-
           resultJson['error'] = 'Some error';
           reject(resultJson);
         }
@@ -167,7 +153,7 @@ async function callbackLatLon(fromLat, fromLon, toLat, toLon, num) {
 
 router.get('/poisearch', async (req, res) => {
   let coordinates = [{}];
-  let passLists;
+  let passLists = '';
   for (let i = 0; i < 5; i++) {
     let tmp = await callbackLatLon(
       req.query.fromLat,
@@ -181,31 +167,38 @@ router.get('/poisearch', async (req, res) => {
       lon: tmp.searchPoiInfo.pois.poi[0].frontLon,
     });
   }
-  console.log(coordinates);
-  let ori_x = (req.query.fromLon - req.query.toLon);
-  let ori_y = (req.query.fromLat - req.query.toLat);
+  let ori_x = req.query.fromLon - req.query.toLon;
+  let ori_y = req.query.fromLat - req.query.toLat;
   let dis_u = Math.sqrt(ori_x * ori_x + ori_y * ori_y);
   let norm_x = ori_x / dis_u;
   let norm_y = ori_y / dis_u;
-  console.log(dis_u);
+  let lonArr = [];
+  let latArr = [];
   for (let i = 1; i < 6; i++) {
     if (Object.keys(coordinates[i]).length != 0) {
-      let dif_x = (req.query.fromLon - coordinates[i].lon);
-      let dif_y = (req.query.fromLat - coordinates[i].lat);
-      let dis_v = Math.sqrt(dif_x*dif_x + dif_y*dif_y);
+      let dif_x = req.query.fromLon - coordinates[i].lon;
+      let dif_y = req.query.fromLat - coordinates[i].lat;
+      let dis_v = Math.sqrt(dif_x * dif_x + dif_y * dif_y);
       let norm_x2 = dif_x / dis_v;
       let norm_y2 = dif_y / dis_v;
       let theta = norm_x * norm_x2 + norm_y * norm_y2;
       theta = Math.acos(theta);
-      let degree = theta * (180/3.141592);
-      console.log(theta, degree);
-      if(degree<30)
-        passLists += coordinates[i].lon + ',' + coordinates[i].lat + '_';
+      let degree = theta * (180 / 3.141592);
+      if (degree < 30) {
+        lonArr.push(coordinates[i].lon);
+        latArr.push(coordinates[i].lat);
+      }
     }
   }
+  const lonSet = new Set(lonArr);
+  const latSet = new Set(latArr);
+  lonArr = Array.from(lonSet);
+  latArr = Array.from(latSet);
 
-  passLists = passLists.substring(9, passLists.length - 1);
-
+  for (let i = 0; i < lonArr.length; i++) {
+    passLists += lonArr[i] + ',' + latArr[i] + '_';
+  }
+  passLists = passLists.substring(0, passLists.length - 1);
   let options = {
     uri: 'https://apis.openapi.sk.com/tmap/routes/pedestrian?version={version}&callback={callback}',
     method: 'POST',
@@ -255,7 +248,6 @@ router.get('/electric', async (req, res) => {
     encodeURIComponent('signguNm') +
     '=' +
     encodeURIComponent(`${signgu}`);
-  console.log(signgu);
   if (signgu == '동작구') {
     resultJson = {
       response: {
@@ -274,7 +266,7 @@ router.get('/electric', async (req, res) => {
               longitude: '126.98',
             },
             {
-              fcltyNm: '상도 5동 동사무소',
+              fcltyNm: '상도 1동 동사무소',
               rdnmadr: '서울특별시 동작구 상도1동 상도로53길 9 주민센터',
               latitude: '37.498043',
               longitude: '126.953090',
