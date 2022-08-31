@@ -190,7 +190,7 @@ router.get('/poisearch', async (req, res) => {
       let theta = norm_x * norm_x2 + norm_y * norm_y2;
       theta = Math.acos(theta);
       let degree = theta * (180 / 3.141592);
-      if (degree < 30) {
+      if (degree < 20) {
         lonArr.push(coordinates[i].lon);
         latArr.push(coordinates[i].lat);
       }
@@ -211,8 +211,8 @@ router.get('/poisearch', async (req, res) => {
     form: {
       startX: req.query.fromLon,
       startY: req.query.fromLat,
-      angle: 20,
-      speed: 30,
+      angle: 10,
+      speed: 4,
       endX: req.query.toLon,
       endY: req.query.toLat,
       searchOption: 4,
@@ -231,7 +231,6 @@ router.get('/poisearch', async (req, res) => {
 
 router.get('/electric', async (req, res) => {
   let fg = await findgu(req.query.lat, req.query.lon);
-  // console.log(fg);
   let signgu = fg.addressInfo.gu_gun;
 
   const url =
