@@ -199,7 +199,7 @@ router.get('/poisearch', async (req, res) => {
       theta = Math.acos(theta);
       let degree = theta * (180/3.141592);
       console.log(theta, degree);
-      if(degeree<30)
+      if(degree<30)
         passLists += coordinates[i].lon + ',' + coordinates[i].lat + '_';
     }
   }
