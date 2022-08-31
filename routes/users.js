@@ -176,8 +176,14 @@ router.get('/poisearch', async (req, res) => {
   let latArr = [];
   for (let i = 1; i < 6; i++) {
     if (Object.keys(coordinates[i]).length != 0) {
-      let dif_x = req.query.fromLon - coordinates[i].lon;
-      let dif_y = req.query.fromLat - coordinates[i].lat;
+      let dif_x, dif_y;
+      if (i == 1) {
+        dif_x = req.query.fromLon - coordinates[i].lon;
+        dif_y = req.query.fromLat - coordinates[i].lat;
+      } else {
+        dif_x = coordinates[i - 1].lon - coordinates[i].lon;
+        dif_y = coordinates[i - 1].lat - coordinates[i].lon;
+      }
       let dis_v = Math.sqrt(dif_x * dif_x + dif_y * dif_y);
       let norm_x2 = dif_x / dis_v;
       let norm_y2 = dif_y / dis_v;
