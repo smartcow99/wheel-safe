@@ -6,6 +6,7 @@ const request = require('request');
 const multer = require('multer');
 const path = require('path');
 const cors = require('cors');
+const { ELECTRONIC_CHARGER_LOCATIONS } = require('../utils/category');
 
 const upload = multer({
   storage: multer.diskStorage({
@@ -143,10 +144,10 @@ async function callbackLatLon(fromLat, fromLon, toLat, toLon, num) {
 }
 
 router.get('/poisearch', async (req, res) => {
-  let coordinates = [{}];
+  const coordinates = [{}];
   let passLists = '';
   for (let i = 0; i < 5; i++) {
-    let tmp = await callbackLatLon(
+    const tmp = await callbackLatLon(
       req.query.fromLat,
       req.query.fromLon,
       req.query.toLat,
@@ -158,13 +159,13 @@ router.get('/poisearch', async (req, res) => {
       lon: tmp.searchPoiInfo.pois.poi[0].frontLon,
     });
   }
-  let ori_x = req.query.fromLon - req.query.toLon;
-  let ori_y = req.query.fromLat - req.query.toLat;
-  let dis_u = Math.sqrt(ori_x * ori_x + ori_y * ori_y);
-  let norm_x = ori_x / dis_u;
-  let norm_y = ori_y / dis_u;
-  let lonArr = [];
-  let latArr = [];
+  const ori_x = req.query.fromLon - req.query.toLon;
+  const ori_y = req.query.fromLat - req.query.toLat;
+  const dis_u = Math.sqrt(ori_x * ori_x + ori_y * ori_y);
+  const norm_x = ori_x / dis_u;
+  const norm_y = ori_y / dis_u;
+  const lonArr = [];
+  const latArr = [];
   for (let i = 1; i < 6; i++) {
     if (Object.keys(coordinates[i]).length != 0) {
       let dif_x, dif_y;
@@ -175,12 +176,12 @@ router.get('/poisearch', async (req, res) => {
         dif_x = coordinates[i - 1].lon - coordinates[i].lon;
         dif_y = coordinates[i - 1].lat - coordinates[i].lon;
       }
-      let dis_v = Math.sqrt(dif_x * dif_x + dif_y * dif_y);
-      let norm_x2 = dif_x / dis_v;
-      let norm_y2 = dif_y / dis_v;
+      const dis_v = Math.sqrt(dif_x * dif_x + dif_y * dif_y);
+      const norm_x2 = dif_x / dis_v;
+      const norm_y2 = dif_y / dis_v;
       let theta = norm_x * norm_x2 + norm_y * norm_y2;
       theta = Math.acos(theta);
-      let degree = theta * (180 / 3.141592);
+      const degree = theta * (180 / 3.141592);
       if (degree < 20) {
         lonArr.push(coordinates[i].lon);
         latArr.push(coordinates[i].lat);
@@ -196,7 +197,7 @@ router.get('/poisearch', async (req, res) => {
     passLists += lonArr[i] + ',' + latArr[i] + '_';
   }
   passLists = passLists.substring(0, passLists.length - 1);
-  let options = {
+  const options = {
     uri: 'https://apis.openapi.sk.com/tmap/routes/pedestrian?version={version}&callback={callback}',
     method: 'POST',
     form: {
@@ -235,56 +236,7 @@ router.get('/electric', async (req, res) => {
     resultJson = {
       response: {
         body: {
-          items: [
-            {
-              fcltyNm: '서울 시립 남부 장애인 종합복지관',
-              rdnmadr: '서울특별시 동작구 신대방동 395번지 보라매공원 내',
-              latitude: '37.490147',
-              longitude: '126.916894',
-            },
-            {
-              fcltyNm: '이수 자이',
-              rdnmadr: '서울특별시 동작구 사당1동 148-16',
-              latitude: '37.4845',
-              longitude: '126.98',
-            },
-            {
-              fcltyNm: '상도 1동 동사무소',
-              rdnmadr: '서울특별시 동작구 상도1동 상도로53길 9 주민센터',
-              latitude: '37.498043',
-              longitude: '126.953090',
-            },
-            {
-              fcltyNm: '총신대학교 종합관',
-              rdnmadr: '서울특별시 동작구 사당로 143',
-              latitude: '37.489732',
-              longitude: '126.966511',
-            },
-            {
-              fcltyNm: '국립 서울 현충 만남의집',
-              rdnmadr: '동작동 산41-2번지 동작동국립서울현충만남의집내서점 동작구 서울특별시 KR',
-              latitude: '37.503194',
-              longitude: '126.969335',
-            },
-            {
-              fcltyNm: '사당역',
-              rdnmadr: 'KR 서울특별시 동작구 사당동 588-44번지 지하층 지하3층 사당역4 433동 106호',
-              latitude: '37.476825',
-              longitude: '126.981591',
-            },
-            {
-              fcltyNm: '동작구차근린공원',
-              rdnmadr: '서울특별시 동작구 현충로 220 동작역 9호선 청년창업스튜디오',
-              latitude: '37.503667',
-              longitude: '126.977298',
-            },
-            {
-              fcltyNm: '노량진역 지하 1층',
-              rdnmadr: '서울특별시 동작구 노량진동 60-11 노량진역 지하 1층',
-              latitude: '37.513547',
-              longitude: '126.940842',
-            },
-          ],
+          items: ELECTRONIC_CHARGER_LOCATIONS,
         },
       },
     };

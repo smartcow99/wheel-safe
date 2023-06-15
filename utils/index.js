@@ -99,3 +99,102 @@ exports.getPageInfo = (totalCount = 0, requestedPage = 1, perPage = 10) => {
     startRow, // SQL LIMIT offset
   };
 };
+
+/**
+ *
+ * @param {Float} fromLat 출발지 위도
+ * @param {Float} fromLon 출발지 경도
+ * @param {Float} toLat 도착지 위도
+ * @param {Float} toLon 도착지 경도
+ * @param {Integer} num 반복 횟수
+ */
+exports.callbackLatLon = (fromLat, fromLon, toLat, toLon, num) => {
+  const url =
+    'https://apis.openapi.sk.com/tmap/pois/search/around?version=1&format=json&callback=result';
+  let queryParmas = '&' + encodeURIComponent('categories') + '=' + encodeURIComponent('초등학교');
+  queryParmas +=
+    '&' + encodeURIComponent('appKey') + '=' + encodeURIComponent(`${process.env.TMAP_KEY}`);
+  queryParmas += '&' + encodeURIComponent('count') + '=' + encodeURIComponent('1');
+  queryParmas += '&' + encodeURIComponent('radius') + '=' + encodeURIComponent('1');
+
+  const maps = {
+    lon: [
+      (fromLon * 1 + toLon * 5) / 6,
+      (fromLon * 2 + toLon * 4) / 6,
+      (fromLon * 3 + toLon * 3) / 6,
+      (fromLon * 4 + toLon * 2) / 6,
+      (fromLon * 5 + toLon * 1) / 6,
+    ],
+    lat: [
+      (fromLat * 1 + toLat * 5) / 6,
+      (fromLat * 2 + toLat * 4) / 6,
+      (fromLat * 3 + toLat * 3) / 6,
+      (fromLat * 4 + toLat * 2) / 6,
+      (fromLat * 5 + toLat * 1) / 6,
+    ],
+  };
+
+  let qp = queryParmas;
+  qp +=
+    '&' +
+    encodeURIComponent('centerLon') +
+    '=' +
+    encodeURIComponent(`${parseFloat(maps.lon[num])}`);
+  qp +=
+    '&' +
+    encodeURIComponent('centerLat') +
+    '=' +
+    encodeURIComponent(`${parseFloat(maps.lat[num])}`);
+
+  return new Promise((resolve, reject) => {
+    let resultJson = {};
+    request(
+      {
+        url: url + qp,
+        method: 'GET',
+      },
+
+      function (err, res, body) {
+        if (!err && res.statusCode === 200) {
+          resultJson = JSON.parse(body);
+          resolve(resultJson);
+        } else {
+          resultJson['error'] = 'Some error';
+          reject(resultJson);
+        }
+      }
+    );
+  });
+};
+
+/**
+ * @param {Float} lat 위도
+ * @param {Float} lon 경도
+ */
+exports.findgu = (lat, lon) => {
+  const url = 'https://apis.openapi.sk.com/tmap/geo/reversegeocoding?version={version}';
+
+  let queryParams = '&' + encodeURIComponent('lat') + '=' + lat;
+  queryParams += '&' + encodeURIComponent('lon') + '=' + lon;
+  queryParams += '&' + encodeURIComponent('appKey') + '=' + `${process.env.TMAP_KEY}`;
+
+  return new Promise((resolve, reject) => {
+    let resultJson = {};
+    request(
+      {
+        url: url + queryParams,
+        method: 'GET',
+      },
+
+      function (err, res, body) {
+        if (!err && res.statusCode === 200) {
+          resultJson = JSON.parse(body);
+          resolve(resultJson);
+        } else {
+          resultJson['error'] = 'Some error';
+          reject(resultJson);
+        }
+      }
+    );
+  });
+};
