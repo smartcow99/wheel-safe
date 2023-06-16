@@ -50,3 +50,10 @@ exports.signupSchema = Joi.object({
     client: Joi.string().valid('app').error(new CustomError('INVALID_CLIENT_TYPE')),
   }).unknown(true),
 }).unknown(true);
+
+exports.getReportSchema = Joi.object({
+  body: Joi.object({
+    page: Joi.number().required(),
+    pageSize: Joi.number().required(),
+  }).unknown(false),
+}).unknown(false);

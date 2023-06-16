@@ -9,7 +9,7 @@ router
   .get(auth(), validator(), asyncWrapper(getPoisearchController));
 
 router
-  /** 안전한 길 찾기 위도, 경도 조회 */
+  /** 전동 휠체어 충전소 조회 */
   .route('/electronic')
   .get(auth(), validator(), asyncWrapper(getElectronicController));
 
