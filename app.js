@@ -3,7 +3,7 @@ const path = require('path');
 const logger = require('morgan');
 const cookieParser = require('cookie-parser');
 const session = require('express-session');
-const cors = require('cors')
+const cors = require('cors');
 require('dotenv').config();
 
 const indexRouter = require('./routes');
@@ -46,10 +46,10 @@ app.use((req, res, next) => {
   next(createError(404));
 });
 
-app.get('/', (req,res)=>{
-  console.log("main page");
+app.get('/', (req, res) => {
+  console.log('main page');
   res.render('index');
-})
+});
 
 // error handler
 app.use((err, req, res, next) => {
